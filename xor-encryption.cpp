@@ -49,7 +49,6 @@ std::string binaryToString(std::string const &binaryStr) {
 		char c = binaryToChar(binaryList[j]);
 		std::string s2(1, c);
 		text += s2;
-		std::cout << text[j] << std::endl;
 	}
 
 	return text;
