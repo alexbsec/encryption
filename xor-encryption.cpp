@@ -68,24 +68,24 @@ std::string bitwiseXOR(std::string textA, std::string textB) {
 	for (int i = 0; i < textBinaryA.length(); ++i) {
 		if (textBinaryA[i] == ' ') {
 			output += ' ';
-		}
+		} else {
 		output += exclusiveOr(textBinaryA[i], textBinaryB[i]);
+		}
 	}
-
 	return output;
 }
 
 std::string generateOneTimePadKey(const std::string &text) {
-    std::string key;
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 1);
+	std::string key;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(33, 126);
 
-    for (int i = 0; i < text.length(); i++) {
-        key += std::to_string(dis(gen));
-    }
+	for (int i = 0; i < text.length(); i++) {
+ 		key += char(dis(gen));
+	}
 
-    return key;
+	return key;
 }
 
 
@@ -98,6 +98,8 @@ int main() {
 
 	std::cout << "Plain text input: " << plainText << std::endl;
 	
+	std::cout << "Key generated is: " << key << std::endl;
+
 	std::string ciphertextBinary = bitwiseXOR(plainText, key);
 
 	std::string ciphertext = binaryToString(ciphertextBinary);
