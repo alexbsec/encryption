@@ -81,7 +81,7 @@ std::string generateOneTimePadKey(const std::string &text) {
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(33, 126);
 
-	for (int i = 0; i < text.length(); i++) {
+	for (int i = 0; i < text.length(); ++i) {
  		key += char(dis(gen));
 	}
 
