@@ -4,7 +4,21 @@
 #include <string>
 #include <random>
 
+char binaryToChar(const std::string &binary) {
+    int decimal = 0;
+    for (int i = 0; i < binary.length(); ++i) {
+        if (binary[i] == '1') {
+            decimal += pow(2, 7 - i);
+        }
+    }
 
+	char ascii = (char)decimal;
+    if (decimal >= 33 && decimal <= 126) {
+        return ascii;
+    } else {
+        return '\0';
+    }
+}
 
 std::string stringToBinary(std::string const &text) {
 	std::string binary = "";
@@ -31,13 +45,11 @@ std::string binaryToString(std::string const &binaryStr) {
 		}
 	}
 
-
-
 	for (int j = 0; j < textLen; ++j) {
-		std::bitset<8> binary(binaryList[j]);
-		char c = static_cast<char>(binary.to_ulong());
+		char c = binaryToChar(binaryList[j]);
 		std::string s2(1, c);
 		text += s2;
+		std::cout << text[j] << std::endl;
 	}
 
 	return text;
@@ -91,16 +103,16 @@ std::string generateOneTimePadKey(const std::string &text) {
 
 int main() {
 	std::string plainText, key, output;
-	std::cout << "Enter a string: ";
+	std::cout << "Enter a text to be ciphered: ";
 	std::getline(std::cin, plainText);
 
 	key = generateOneTimePadKey(plainText);
 
 	std::cout << "Plain text input: " << plainText << std::endl;
-	
-	std::cout << "Key generated is: " << key << std::endl;
 
 	std::string ciphertextBinary = bitwiseXOR(plainText, key);
+
+	std::cout << "Binary ciphertext: " << ciphertextBinary << std::endl;
 
 	std::string ciphertext = binaryToString(ciphertextBinary);
 
