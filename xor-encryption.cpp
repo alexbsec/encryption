@@ -8,7 +8,7 @@ char binaryToChar(const std::string &binary) {
     int decimal = 0;
     for (int i = 0; i < binary.length(); ++i) {
         if (binary[i] == '1') {
-            decimal += pow(2, 7 - i);
+            decimal += pow(2, binary.length() - 1 - i);
         }
     }
 
