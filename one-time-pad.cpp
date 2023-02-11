@@ -338,16 +338,13 @@ const std::map<char, std::string> ascii2binaryTable {
 };
 
 
-std::pair<std::vector<std::string>, int> binaryVector(const std::string &binary) {
+std::vector<std::string> binaryVector(const std::string &binary) {
     std::string tempBinary = "";
     std::vector<std::string> binaryList;
-    int textLen = 0;
-
     for (int i = 0; i < binary.length(); ++i) {
         if (binary[i] == ' ') {
             binaryList.push_back(tempBinary);
             tempBinary = ""; 
-            textLen++;
         } else {
             std::string s(1, binary[i]);
             tempBinary += s;
@@ -355,12 +352,11 @@ std::pair<std::vector<std::string>, int> binaryVector(const std::string &binary)
         
     }
 
-    return std::make_pair(binaryList, textLen);
+    return binaryList;
 }
 
 int binary2dec(const std::string &binary) {
     int decimal = 0;
-
     for (int i = 0; i < binary.length(); ++i) {
         if (binary[i] == '1') {
             decimal += pow(2, binary.length() - 1 - i);
@@ -372,7 +368,6 @@ int binary2dec(const std::string &binary) {
 
 char binary2char(const std::string &binary) {
     char ascii = (char)binary2dec(binary);
-
     return ascii;
 }
 
@@ -394,11 +389,8 @@ std::string string2binary(const std::string &str) {
 
 std::string binary2string(const std::string &binary) {
     std::string out;
-
-    auto [binaryList, textLen] = binaryVector(binary);
-
-
-    for (int i = 0; i < textLen; ++i) {
+    std::vector<std::string> binaryList = binaryVector(binary);
+    for (int i = 0; i < binaryList.size(); ++i) {
         char c = binary2char(binaryList[i]);
         std::string s2(1, c);
         out += s2;
@@ -420,9 +412,9 @@ std::string correctBinary(const std::string &binary) {
     std::string correctedBinary = "";
     char inBinaryChar;
     std::string nullBinary = "00000000";
-    auto [binaryList, textLen] = binaryVector(binary);
+    std::vector<std::string> binaryList = binaryVector(binary);
 
-    for (int i = 0; i < textLen; ++i) {
+    for (int i = 0; i < binaryList.size(); ++i) {
         int decimal = binary2dec(binaryList[i]);
         if ((decimal < 32 || decimal > 126) && decimal != 0) {
             inBinaryChar = binary2asciiTable.at(binaryList[i]);
@@ -441,7 +433,8 @@ std::string correctBinary(const std::string &binary) {
 }
 
 std::string revertBackToOriginalBinary(const std::string &binary) {
-    auto [binaryList, textLen] = binaryVector(binary);
+    std::vector<std::string> binaryList = binaryVector(binary);
+    int textLen = binaryList.size();
     std::string nullBinary = "00000000";
     std::string originalBinary = "";
     for (int i = 0; i < textLen; ++i) {
@@ -491,6 +484,33 @@ std::string oneTimePad(std::string textA, std::string textB) {
     return binary2string(out);
 }
 
+std::string base64_encode(const std::string &in) {
+  std::string out;
+
+  const std::string base64_chars = 
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789+/";
+
+  int val = 0, valb = -6;
+  for (unsigned char c : in) {
+    val = (val << 8) + c;
+    valb += 8;
+    while (valb >= 0) {
+      out.push_back(base64_chars[(val >> valb) & 0x3F]);
+      valb -= 6;
+    }
+  }
+  if (valb > -6) {
+    out.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
+  }
+  while (out.size() % 4) {
+    out.push_back('=');
+  }
+
+  return out;
+}
+
 std::string generateOneTimePadKey(const std::string &text) {
 	std::string key;
 	std::random_device rd;
@@ -504,15 +524,40 @@ std::string generateOneTimePadKey(const std::string &text) {
 	return key;
 }
 
+std::string base64_decode(const std::string &in) {
+  std::string out;
+
+  std::vector<int> T(256, -1);
+  for (int i = 0; i < 64; i++) {
+    T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
+  }
+
+  int val = 0, valb = -8;
+  for (unsigned char c : in) {
+    if (T[c] == -1) break;
+    val = (val << 6) + T[c];
+    valb += 6;
+    if (valb >= 0) {
+      out.push_back(char((val >> valb) & 0xFF));
+      valb -= 8;
+    }
+  }
+
+  return out;
+}
+
+
 
 
 int main() {
     std::string password = "simplepassword123";
-    std::string key = generateOneTimePadKey(text);
-    std::string cipher  = oneTimePad(text, key);
+    std::string key = generateOneTimePadKey(password);
+    std::string password64 = base64_encode(password);
+    std::string key64 = base64_encode(key);
+    std::string cipher64  = oneTimePad(password64, key64);
 
-    std::cout << "Encrypted text: " << cipher << std::endl;
-    std::cout << "Decrypted text: " << oneTimePad(cipher, key) << std::endl;
+    std::cout << "Encrypted password: " << cipher64 << std::endl;
+    std::cout << "Decrypted password: " << base64_decode(oneTimePad(cipher64, key64)) << std::endl;
 
     return 0;
 }
