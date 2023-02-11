@@ -511,18 +511,6 @@ std::string base64_encode(const std::string &in) {
   return out;
 }
 
-std::string generateOneTimePadKey(const std::string &text) {
-	std::string key;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(33, 126);
-
-	for (int i = 0; i < text.length(); ++i) {
- 		key += char(dis(gen));
-	}
-
-	return key;
-}
 
 std::string base64_decode(const std::string &in) {
   std::string out;
@@ -546,7 +534,18 @@ std::string base64_decode(const std::string &in) {
   return out;
 }
 
+std::string generateOneTimePadKey(const std::string &text) {
+	std::string key;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(33, 126);
 
+	for (int i = 0; i < text.length(); ++i) {
+ 		key += char(dis(gen));
+	}
+
+	return key;
+}
 
 
 int main() {
