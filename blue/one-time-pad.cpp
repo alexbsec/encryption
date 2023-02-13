@@ -1,178 +1,170 @@
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
-#include <bitset>
-#include <random>
-#include <algorithm>
+#include "one-time-pad.h"
 
+const std::map<std::string, char> OTP::binary2asciiTable {
+        {"00000001", '0'},
+        {"00000010", '1'},
+        {"00000011", '2'},
+        {"00000100", '3'},
+        {"00000101", '4'},
+        {"00000110", '5'},
+        {"00000111", '6'},
+        {"00001000", '7'},
+        {"00001001", '8'},
+        {"00001010", '9'},
+        {"00001011", 'a'},
+        {"00001100", 'b'},
+        {"00001101", 'c'},
+        {"00001110", 'd'},
+        {"00001111", 'e'},
+        {"00010000", 'f'},
+        {"00010001", 'g'},
+        {"00010010", 'h'},
+        {"00010011", 'i'},
+        {"00010100", 'j'},
+        {"00010101", 'k'},
+        {"00010110", 'l'},
+        {"00010111", 'm'},
+        {"00011000", 'n'},
+        {"00011001", 'p'},
+        {"00011010", 'q'},
+        {"00011011", 'r'},
+        {"00011100", 's'},
+        {"00011101", 't'},
+        {"00011110", 'u'},
+        {"00011111", 'v'},
 
-const std::map<std::string, char> binary2asciiTable {
-    {"00000001", '0'},
-    {"00000010", '1'},
-    {"00000011", '2'},
-    {"00000100", '3'},
-    {"00000101", '4'},
-    {"00000110", '5'},
-    {"00000111", '6'},
-    {"00001000", '7'},
-    {"00001001", '8'},
-    {"00001010", '9'},
-    {"00001011", 'a'},
-    {"00001100", 'b'},
-    {"00001101", 'c'},
-    {"00001110", 'd'},
-    {"00001111", 'e'},
-    {"00010000", 'f'},
-    {"00010001", 'g'},
-    {"00010010", 'h'},
-    {"00010011", 'i'},
-    {"00010100", 'j'},
-    {"00010101", 'k'},
-    {"00010110", 'l'},
-    {"00010111", 'm'},
-    {"00011000", 'n'},
-    {"00011001", 'p'},
-    {"00011010", 'q'},
-    {"00011011", 'r'},
-    {"00011100", 's'},
-    {"00011101", 't'},
-    {"00011110", 'u'},
-    {"00011111", 'v'},
-
-    {"11100011", 'w'},
-    {"11100100", 'y'},
-    {"11100101", 'z'},
-    {"11100110", 'A'},
-    {"11100111", 'B'},
-    {"11101000", 'C'},
-    {"11101001", 'D'},
-    {"11101010", 'E'},
-    {"11101011", 'F'},
-    {"11101100", 'G'},
-    {"11101101", 'H'},
-    {"11101110", 'I'},
-    {"11101111", 'J'},
-    {"11110000", 'K'},
-    {"11110001", 'L'},
-    {"11110010", 'M'},
-    {"11110011", 'N'},
-    {"11110100", 'O'},
-    {"11110101", 'P'},
-    {"11110110", 'Q'},
-    {"11110111", 'R'},
-    {"11111000", 'S'},
-    {"11111001", 'T'},
-    {"11111010", 'U'},
-    {"11111011", 'V'},
-    {"11111100", 'X'},
-    {"11111101", 'W'},
-    {"11111110", 'Y'},
-    {"11111111", 'Z'},
-    {"01111111", char(162)},
-    {"10000000", char(163)},
-    {"10000001", char(164)},
-    {"10000010", char(165)},
-    {"10000011", char(166)},
-    {"10000100", char(167)},
-    {"10000101", char(168)},
-    {"10000110", char(169)},
-    {"10000111", char(170)},
-    {"10001000", char(171)},
-    {"10001001", char(172)},
-    {"10001010", char(174)},
-    {"10001011", char(177)},
-    {"10001100", char(180)},
-    {"10001101", char(187)},
-    {"10001110", char(191)},
-    {"10001111", char(192)},
-    {"10010001", char(193)},
-    {"10010010", char(194)},
-    {"10010011", char(195)},
-    {"10010100", char(196)},
-    {"10010101", char(197)},
-    {"10010110", char(198)},
-    {"10010111", char(199)},
-    {"10011000", char(200)},
-    {"10011001", char(201)},
-    {"10011010", char(202)},
-    {"10011011", char(203)},
-    {"10011100", char(204)},
-    {"10011101", char(205)},
-    {"10011110", char(206)},
-    {"10011111", char(207)},
-    {"10100000", char(208)},
-    {"10100001", char(209)},
-    {"10100010", char(210)},
-    {"10100011", char(211)},
-    {"10100100", char(212)},
-    {"10100101", char(213)},
-    {"10100110", char(214)},
-    {"10100111", char(215)},
-    {"10101000", char(216)},
-    {"10101001", char(217)},
-    {"10101010", char(218)},
-    {"10101011", char(219)},
-    {"10101100", char(220)},
-    {"10101101", char(221)},
-    {"10101110", char(222)},
-    {"10101111", char(223)},
-    {"10110000", char(224)},
-    {"10110001", char(225)},
-    {"10110010", char(226)},
-    {"10110011", char(227)},
-    {"10110100", char(228)},
-    {"10110101", char(229)},
-    {"10110110", char(230)},
-    {"10110111", char(231)},
-    {"10111000", char(232)},
-    {"10111001", char(233)},
-    {"10111010", char(234)},
-    {"10111011", char(235)},
-    {"10111100", char(236)},
-    {"10111101", char(237)},
-    {"10111110", char(238)},
-    {"10111111", char(239)},
-    {"11000000", char(240)},
-    {"11000001", char(241)},
-    {"11000010", char(242)},
-    {"11000011", char(243)},
-    {"11000100", char(244)},
-    {"11000101", char(245)},
-    {"10000101", char(246)},
-    {"11000110", char(247)},
-    {"11000111", char(248)},
-    {"11001000", char(249)},
-    {"11001001", char(250)},
-    {"11001010", char(250)},
-    {"11001011", char(251)},
-    {"11001100", char(252)},
-    {"11001101", char(253)},
-    {"11001110", char(254)},
-    {"11001111", char(255)},
-    {"11010000", '!'},
-    {"11010001", '@'},
-    {"11010010", '#'},
-    {"11010011", '$'},
-    {"11010100", '%'},
-    {"11010101", '^'},
-    {"11010110", '&'},
-    {"11010111", '*'},
-    {"11011000", '('},
-    {"11011001", ')'},
-    {"11011010", '-'},
-    {"11011011", '_'},
-    {"11011100", '+'},
-    {"11011101", '='},
-    {"11011110", '['},
-    {"11011111", '{'},
-    {"11100000", ']'},
-    {"11100001", '}'},
-    {"11100010", '|'},
-    {"11100011", '/'},    
-};
-
-const std::map<char, std::string> ascii2binaryTable {
+        {"11100011", 'w'},
+        {"11100100", 'y'},
+        {"11100101", 'z'},
+        {"11100110", 'A'},
+        {"11100111", 'B'},
+        {"11101000", 'C'},
+        {"11101001", 'D'},
+        {"11101010", 'E'},
+        {"11101011", 'F'},
+        {"11101100", 'G'},
+        {"11101101", 'H'},
+        {"11101110", 'I'},
+        {"11101111", 'J'},
+        {"11110000", 'K'},
+        {"11110001", 'L'},
+        {"11110010", 'M'},
+        {"11110011", 'N'},
+        {"11110100", 'O'},
+        {"11110101", 'P'},
+        {"11110110", 'Q'},
+        {"11110111", 'R'},
+        {"11111000", 'S'},
+        {"11111001", 'T'},
+        {"11111010", 'U'},
+        {"11111011", 'V'},
+        {"11111100", 'X'},
+        {"11111101", 'W'},
+        {"11111110", 'Y'},
+        {"11111111", 'Z'},
+        {"01111111", char(162)},
+        {"10000000", char(163)},
+        {"10000001", char(164)},
+        {"10000010", char(165)},
+        {"10000011", char(166)},
+        {"10000100", char(167)},
+        {"10000101", char(168)},
+        {"10000110", char(169)},
+        {"10000111", char(170)},
+        {"10001000", char(171)},
+        {"10001001", char(172)},
+        {"10001010", char(174)},
+        {"10001011", char(177)},
+        {"10001100", char(180)},
+        {"10001101", char(187)},
+        {"10001110", char(191)},
+        {"10001111", char(192)},
+        {"10010001", char(193)},
+        {"10010010", char(194)},
+        {"10010011", char(195)},
+        {"10010100", char(196)},
+        {"10010101", char(197)},
+        {"10010110", char(198)},
+        {"10010111", char(199)},
+        {"10011000", char(200)},
+        {"10011001", char(201)},
+        {"10011010", char(202)},
+        {"10011011", char(203)},
+        {"10011100", char(204)},
+        {"10011101", char(205)},
+        {"10011110", char(206)},
+        {"10011111", char(207)},
+        {"10100000", char(208)},
+        {"10100001", char(209)},
+        {"10100010", char(210)},
+        {"10100011", char(211)},
+        {"10100100", char(212)},
+        {"10100101", char(213)},
+        {"10100110", char(214)},
+        {"10100111", char(215)},
+        {"10101000", char(216)},
+        {"10101001", char(217)},
+        {"10101010", char(218)},
+        {"10101011", char(219)},
+        {"10101100", char(220)},
+        {"10101101", char(221)},
+        {"10101110", char(222)},
+        {"10101111", char(223)},
+        {"10110000", char(224)},
+        {"10110001", char(225)},
+        {"10110010", char(226)},
+        {"10110011", char(227)},
+        {"10110100", char(228)},
+        {"10110101", char(229)},
+        {"10110110", char(230)},
+        {"10110111", char(231)},
+        {"10111000", char(232)},
+        {"10111001", char(233)},
+        {"10111010", char(234)},
+        {"10111011", char(235)},
+        {"10111100", char(236)},
+        {"10111101", char(237)},
+        {"10111110", char(238)},
+        {"10111111", char(239)},
+        {"11000000", char(240)},
+        {"11000001", char(241)},
+        {"11000010", char(242)},
+        {"11000011", char(243)},
+        {"11000100", char(244)},
+        {"11000101", char(245)},
+        {"10000101", char(246)},
+        {"11000110", char(247)},
+        {"11000111", char(248)},
+        {"11001000", char(249)},
+        {"11001001", char(250)},
+        {"11001010", char(250)},
+        {"11001011", char(251)},
+        {"11001100", char(252)},
+        {"11001101", char(253)},
+        {"11001110", char(254)},
+        {"11001111", char(255)},
+        {"11010000", '!'},
+        {"11010001", '@'},
+        {"11010010", '#'},
+        {"11010011", '$'},
+        {"11010100", '%'},
+        {"11010101", '^'},
+        {"11010110", '&'},
+        {"11010111", '*'},
+        {"11011000", '('},
+        {"11011001", ')'},
+        {"11011010", '-'},
+        {"11011011", '_'},
+        {"11011100", '+'},
+        {"11011101", '='},
+        {"11011110", '['},
+        {"11011111", '{'},
+        {"11100000", ']'},
+        {"11100001", '}'},
+        {"11100010", '|'},
+        {"11100011", '/'},    
+    };
+const std::map<char, std::string> OTP::ascii2binaryTable {
     {'0', "00000001"},
     {'1', "00000010"},
     {'2', "00000011"},
@@ -204,7 +196,6 @@ const std::map<char, std::string> ascii2binaryTable {
     {'t', "00011101"},
     {'u', "00011110"},
     {'v', "00011111"},
-
     {'w', "11100011"},
     {'y', "11100100"},
     {'z', "11100101"},
@@ -333,12 +324,12 @@ const std::map<char, std::string> ascii2binaryTable {
     {'{', "11011111"},
     {']', "11100000"},
     {'}', "11100001"},
-    {'|', "11100010"},
     {'/', "11100011"},    
+    {'|', "11100010"},
 };
 
 
-std::vector<std::string> binaryVector(const std::string &binary) {
+std::vector<std::string> OTP::binaryVector(const std::string &binary) {
     std::string tempBinary = "";
     std::vector<std::string> binaryList;
     for (int i = 0; i < binary.length(); ++i) {
@@ -351,43 +342,40 @@ std::vector<std::string> binaryVector(const std::string &binary) {
         }
         
     }
-
     return binaryList;
 }
 
-int binary2dec(const std::string &binary) {
+int OTP::binary2dec(const std::string &binary) {
     int decimal = 0;
     for (int i = 0; i < binary.length(); ++i) {
         if (binary[i] == '1') {
-            decimal += pow(2, binary.length() - 1 - i);
+            decimal += std::pow(2, binary.length() - 1 - i);
         }
     }
-
     return decimal;
 }
 
-char binary2char(const std::string &binary) {
+char OTP::binary2char(const std::string &binary) {
     char ascii = (char)binary2dec(binary);
     return ascii;
 }
 
-std::string char2binary(const char &c) {
+std::string OTP::char2binary(const char &c) {
     std::bitset<8> b(c);
     return b.to_string();
 }
 
-std::string string2binary(const std::string &str) {
+std::string OTP::string2binary(const std::string &str) {
     std::string binary;
     for (char c : str) {
         std::bitset<8> bits(c);
         binary += bits.to_string();
         binary += ' ';
     }
-
     return binary;
 }
 
-std::string binary2string(const std::string &binary) {
+std::string OTP::binary2string(const std::string &binary) {
     std::string out;
     std::vector<std::string> binaryList = binaryVector(binary);
     for (int i = 0; i < binaryList.size(); ++i) {
@@ -395,25 +383,21 @@ std::string binary2string(const std::string &binary) {
         std::string s2(1, c);
         out += s2;
     }
-
     return out;
 }
 
-std::string XOR(char bitA, char bitB) {
+std::string OTP::XOR(char bitA, char bitB) {
     if (bitA == bitB) {
         return "0";
     }
-
     return "1";
 }
 
-
-std::string correctBinary(const std::string &binary) {
+std::string OTP::correctBinary(const std::string &binary) {
     std::string correctedBinary = "";
     char inBinaryChar;
     std::string nullBinary = "00000000";
     std::vector<std::string> binaryList = binaryVector(binary);
-
     for (int i = 0; i < binaryList.size(); ++i) {
         int decimal = binary2dec(binaryList[i]);
         if ((decimal < 32 || decimal > 126) && decimal != 0) {
@@ -422,17 +406,12 @@ std::string correctBinary(const std::string &binary) {
         } else {
             correctedBinary += binaryList[i];
         }
-
         correctedBinary += ' ';
-
-    }
-
-    
-
+    }   
     return correctedBinary;
 }
 
-std::string revertBackToOriginalBinary(const std::string &binary) {
+std::string OTP::revertBackToOriginalBinary(const std::string &binary) {
     std::vector<std::string> binaryList = binaryVector(binary);
     int textLen = binaryList.size();
     std::string nullBinary = "00000000";
@@ -457,20 +436,16 @@ std::string revertBackToOriginalBinary(const std::string &binary) {
                 originalBinary += binaryList[i] + ' ';   
             }
         }
-   
+
     }
-
-
     return originalBinary;
 }
 
-std::string oneTimePad(std::string textA, std::string textB) {
+std::string OTP::oneTimePad(std::string textA, std::string textB) {
     std::string binaryA, binaryB;
     std::string out = "";
-
     binaryA = revertBackToOriginalBinary(string2binary(textA));
     binaryB = revertBackToOriginalBinary(string2binary(textB));
-
     for (int i = 0; i < binaryA.length(); i++) {
         if (binaryA[i] == ' ') {
             out += ' ';
@@ -478,85 +453,121 @@ std::string oneTimePad(std::string textA, std::string textB) {
             out += XOR(binaryA[i], binaryB[i]);
         }
     }
-
     out = correctBinary(out);
-
     return binary2string(out);
 }
 
-std::string base64_encode(const std::string &in) {
-  std::string out;
+const std::string OTP::base64_chars = 
+             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+             "abcdefghijklmnopqrstuvwxyz"
+             "0123456789+/";
 
-  const std::string base64_chars = 
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789+/";
+bool OTP::is_base64(unsigned char c) {
+    return (isalnum(c) || (c == '+') || (c == '/'));
+}
 
-  int val = 0, valb = -6;
-  for (unsigned char c : in) {
-    val = (val << 8) + c;
-    valb += 8;
-    while (valb >= 0) {
-      out.push_back(base64_chars[(val >> valb) & 0x3F]);
-      valb -= 6;
+std::string OTP::base64_encode(const std::string &in) {
+    std::string ret;
+    int i = 0;
+    int j = 0;
+    unsigned char char_array_3[3];
+    unsigned char char_array_4[4];
+    int inLen = in.length();
+
+    while (inLen--) {
+        char_array_3[i++] = in[j++];
+        if (i == 3) {
+            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+            char_array_4[3] = char_array_3[2] & 0x3f;
+
+            for (i = 0; i < 4; i++) {
+                ret += base64_chars[char_array_4[i]];
+            }
+            i = 0;
+        }
     }
-  }
-  if (valb > -6) {
-    out.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
-  }
-  while (out.size() % 4) {
-    out.push_back('=');
-  }
 
-  return out;
-}
+    if (i) {
+        for (j = i; j < 3; j++) {
+            char_array_3[j] = '\0';
+        }
 
+        char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0 >> 4));
+        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+        char_array_4[3] = char_array_3[2] & 0x3f;
 
-std::string base64_decode(const std::string &in) {
-  std::string out;
+        for (j = 0; j < i - 1; j++) {
+            ret += base64_chars[char_array_4[j]];
+        }
 
-  std::vector<int> T(256, -1);
-  for (int i = 0; i < 64; i++) {
-    T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
-  }
-
-  int val = 0, valb = -8;
-  for (unsigned char c : in) {
-    if (T[c] == -1) break;
-    val = (val << 6) + T[c];
-    valb += 6;
-    if (valb >= 0) {
-      out.push_back(char((val >> valb) & 0xFF));
-      valb -= 8;
+        while (i++ < 3) {
+            ret += '=';
+        }
     }
-  }
 
-  return out;
+    return ret;
 }
 
-std::string generateOneTimePadKey(const std::string &text) {
-	std::string key;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> dis(33, 126);
+std::string OTP::base64_decode(const std::string &in) {
+    int inLen = in.size();
+    int i = 0;
+    int j = 0;
+    int in_ = 0;
+    unsigned char char_array_4[4], char_array_3[3];
+    std::string ret;
 
-	for (int i = 0; i < text.length(); ++i) {
- 		key += char(dis(gen));
-	}
+    while (inLen-- && (in[in_] != '=') && is_base64(in[in_])) {
+        char_array_4[i++] = in[in_];
+        in_++;
+        if (i == 4) {
+            for (i = 0; i < 4; i++) {
+                char_array_4[i] = base64_chars.find(char_array_4[i]);
+            }
 
-	return key;
+            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+            for (i = 0; i < 3; i++) {
+                ret += char_array_3[i];
+            }
+
+            i = 0;
+        }
+    }
+    if (i) {
+        for (j = i; j < 4; j++) {
+            char_array_4[j] = 0;
+        }
+
+        for (j = 0; j < 4; j++) {
+            char_array_4[j] = base64_chars.find(char_array_4[j]);
+        }
+
+        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+        char_array_3[2] = ((char_array_4[2] & 0x3) << 6 ) + char_array_4[3];
+
+        for (j = 0; j < i - 1; j++) {
+            ret += char_array_3[j];
+        }
+    }
+
+    return ret;
 }
 
 
-int main() {
-    std::string password = "simplepassword123";
-    std::string key = generateOneTimePadKey(password);
-    std::string password64 = base64_encode(password);
-    std::string key64 = base64_encode(key);
-    std::string cipher64  = oneTimePad(password64, key64);
-
-    std::cout << "Encrypted password: " << cipher64 << std::endl;
-    std::cout << "Decrypted password: " << base64_decode(oneTimePad(cipher64, key64)) << std::endl;
-
-    return 0;
+std::string OTP::generateOneTimePadKey(const std::string &text) {
+    std::string key;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(33, 126);
+    for (int i = 0; i < text.length(); ++i) {
+        key += char(dis(gen));
+    }
+    return key;
 }
+
