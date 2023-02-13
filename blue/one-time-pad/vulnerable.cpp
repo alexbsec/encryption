@@ -7,8 +7,6 @@
 
 static OTP otp;
 
-
-
 int main() {
     std::string filename = "key.txt";
     std::string filename2 = "secret-text.txt";
