@@ -24,8 +24,6 @@ public:
     std::string oneTimePad(std::string textA, std::string textB);
     bool is_base64(unsigned char c);
     static const std::string base64_chars;
-    std::string base64_encode(const std::string &in);
-    std::string base64_decode(const std::string &in);
     std::string generateOneTimePadKey(const std::string &text);
 };
 
