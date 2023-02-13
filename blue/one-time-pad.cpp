@@ -457,16 +457,6 @@ std::string OTP::oneTimePad(std::string textA, std::string textB) {
     return binary2string(out);
 }
 
-const std::string OTP::base64_chars = 
-             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-             "abcdefghijklmnopqrstuvwxyz"
-             "0123456789+/";
-
-bool OTP::is_base64(unsigned char c) {
-    return (isalnum(c) || (c == '+') || (c == '/'));
-}
-
-
 std::string OTP::generateOneTimePadKey(const std::string &text) {
     std::string key;
     std::random_device rd;

@@ -22,8 +22,6 @@ public:
     std::string correctBinary(const std::string &binary);
     std::string revertBackToOriginalBinary(const std::string &binary);
     std::string oneTimePad(std::string textA, std::string textB);
-    bool is_base64(unsigned char c);
-    static const std::string base64_chars;
     std::string generateOneTimePadKey(const std::string &text);
 };
 
